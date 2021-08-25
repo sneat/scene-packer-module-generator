@@ -2,7 +2,7 @@
   <img
     class="SPLogo"
     alt="Scene Packer Logo"
-    src="/hand-truck.svg"
+    src="hand-truck.svg"
   >
 </template>
 

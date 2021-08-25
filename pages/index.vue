@@ -12,7 +12,14 @@
         <v-card-text>
           <p>This generator will help you create a <a href="https://foundryvtt.com/">Foundry VTT</a> module that is initialised with <a href="https://foundryvtt.com/packages/scene-packer">Scene Packer</a>.</p>
           <p>Select whether you have an existing module that you want to incorporate Scene Packer into, or whether it's a new module that you are creating.</p>
-          <p>The generator works entirely client-side, nothing is transferred to the server. Your secrets are safe with you!</p>
+          <p>
+            The generator works entirely
+            <NuxtLink to="/help">
+              client-side
+            </NuxtLink>, nothing is transferred to the server. Your secrets are safe with you! <NuxtLink to="/help">
+              Need help?
+            </NuxtLink>
+          </p>
           <hr class="my-3">
         </v-card-text>
         <v-card-actions>

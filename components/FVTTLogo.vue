@@ -2,7 +2,7 @@
   <img
     class="FVTTLogo"
     alt="Foundry VTT Logo"
-    src="/fvtt-d20.png"
+    src="fvtt-d20.png"
   >
 </template>
 
