@@ -2,7 +2,7 @@
   <img
     class="FVTTLogo"
     alt="Foundry VTT Logo"
-    src="fvtt-d20.png"
+    src="/scene-packer-module-generator/fvtt-d20.png"
   >
 </template>
 
