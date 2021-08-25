@@ -371,6 +371,9 @@ export default {
         moduleJSON.manifest = ''
         delete moduleJSON.media
         moduleJSON.packs = moduleJSON.packs.filter(pack => this.packs.includes(pack.entity))
+        moduleJSON.packs.forEach((pack) => {
+          pack.label = this.adventureName
+        })
         data['module.json'] = fflate.strToU8(JSON.stringify(moduleJSON, null, 2))
 
         const creaturePacks = this.packs.includes('Actor') ? [`${this.moduleName}.actors`, ...this.creaturePacks.map(a => a.value)] : []
@@ -382,8 +385,8 @@ export default {
           .replace(/const adventureName = '.+';/, `const adventureName = '${this.escapeSingleQuotes(this.adventureName)}';`)
           .replace(/const moduleName = '.+';/, `const moduleName = '${this.moduleName}';`)
           .replace(/const welcomeJournal = '.+';/, `const welcomeJournal = '${this.escapeSingleQuotes(this.welcomeJournal)}';`)
-          .replace(/const additionalJournals = \[.+\];/, `const additionalJournals = ${JSON.stringify(this.additionalJournals.map(j => j.value))};`)
-          .replace(/const additionalMacros = \[.+\];/, `const additionalMacros = ${JSON.stringify(this.additionalMacros.map(j => j.value))};`)
+          .replace(/const additionalJournals = \[.+\];/, `const additionalJournals = ${JSON.stringify(this.additionalJournals.filter(j => j.value).map(j => j.value))};`)
+          .replace(/const additionalMacros = \[.+\];/, `const additionalMacros = ${JSON.stringify(this.additionalMacros.filter(j => j.value).map(j => j.value))};`)
           .replace(/const creaturePacks = \[.+\];/, `const creaturePacks = ${JSON.stringify(creaturePacks)};`)
           .replace(/const journalPacks = \[.+\];/, `const journalPacks = ${JSON.stringify(journalPacks)};`)
           .replace(/const macroPacks = \[.+\];/, `const macroPacks = ${JSON.stringify(macroPacks)};`)
