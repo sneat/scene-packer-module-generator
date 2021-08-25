@@ -1,0 +1,38 @@
+<template>
+  <v-row justify="center" align="center">
+    <v-col cols="12" sm="8" md="6">
+      <v-card class="logo mb-3 py-4 d-flex justify-center">
+        <FVTTLogo />
+        <Logo />
+      </v-card>
+      <v-card>
+        <v-card-title class="headline">
+          Welcome to the Scene Packer module generator
+        </v-card-title>
+        <v-card-text>
+          <p>This generator will help you create a <a href="https://foundryvtt.com/">Foundry VTT</a> module that is initialised with <a href="https://foundryvtt.com/packages/scene-packer">Scene Packer</a>.</p>
+          <p>Select whether you have an existing module that you want to incorporate Scene Packer into, or whether it's a new module that you are creating.</p>
+          <p>The generator works entirely client-side, nothing is transferred to the server. Your secrets are safe with you!</p>
+          <hr class="my-3">
+        </v-card-text>
+        <v-card-actions>
+          <!-- <v-btn
+            color="secondary"
+            nuxt
+            to="/existing-module"
+          >
+            Existing module
+          </v-btn> -->
+          <v-spacer />
+          <v-btn
+            color="primary"
+            nuxt
+            to="/new-module"
+          >
+            New module
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-col>
+  </v-row>
+</template>
