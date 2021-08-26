@@ -346,7 +346,7 @@ export default {
     async generate () {
       this.processing = true
       try {
-        const defaultModuleBuffer = await fetch('https://cors-anywhere.ardittristan.workers.dev/corsproxy/?apiurl=https://github.com/sneat/starter-scene-packer/releases/latest/download/starter-scene-packer.zip')
+        const defaultModuleBuffer = await fetch('https://scene-packer-module-generator.herokuapp.com/https://github.com/sneat/starter-scene-packer/releases/latest/download/starter-scene-packer.zip')
         const defaultModule = new Uint8Array(await defaultModuleBuffer.arrayBuffer())
         const data = fflate.unzipSync(defaultModule)
 
