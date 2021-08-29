@@ -64,6 +64,11 @@ export default {
           title: 'New Module',
           to: '/new-module'
         },
+        {
+          icon: 'mdi-database',
+          title: 'Standalone Module',
+          to: '/standalone-module'
+        },
         // {
         //   icon: 'mdi-file-document-edit',
         //   title: 'Existing Module',

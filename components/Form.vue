@@ -112,7 +112,7 @@
             <v-checkbox v-model="packs" class="px-2 pt-0" label="Playlists" value="Playlist" />
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="scenePackerIntegration">
           <v-col cols="12">
             <v-text-field
               v-model.trim="welcomeJournal"
@@ -122,7 +122,7 @@
             />
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="scenePackerIntegration">
           <v-col cols="12" class="d-flex py-0">
             <p>
               Additional Journals to Import:
@@ -141,7 +141,7 @@
             </p>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="scenePackerIntegration">
           <v-col
             v-for="(input, index) in additionalJournals"
             :key="`additionalJournal-${index}`"
@@ -172,7 +172,7 @@
             </v-tooltip>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="scenePackerIntegration">
           <v-col cols="12" class="d-flex py-0">
             <p>
               Additional Macros to Import:
@@ -191,7 +191,7 @@
             </p>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="scenePackerIntegration">
           <v-col
             v-for="(input, index) in additionalMacros"
             :key="`additionalMacros-${index}`"
@@ -222,7 +222,7 @@
             </v-tooltip>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="scenePackerIntegration">
           <v-col cols="12" class="d-flex py-0">
             <p>
               Additional Actor packs to search within:
@@ -241,7 +241,7 @@
             </p>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="scenePackerIntegration">
           <v-col
             v-for="(input, index) in creaturePacks"
             :key="`creaturePacks-${index}`"
@@ -307,6 +307,9 @@ import * as slugify from 'slugify'
 const discordPattern = /^[^#@:]{2,32}#[0-9]{4}$/
 
 export default {
+  props: {
+    scenePackerIntegration: Boolean
+  },
   data () {
     return {
       adventureName: '',
@@ -374,6 +377,9 @@ export default {
         moduleJSON.packs.forEach((pack) => {
           pack.label = this.adventureName
         })
+        if (!this.scenePackerIntegration) {
+          moduleJSON.dependencies = []
+        }
         data['module.json'] = fflate.strToU8(JSON.stringify(moduleJSON, null, 2))
 
         const creaturePacks = this.packs.includes('Actor') ? [`${this.moduleName}.actors`, ...this.creaturePacks.map(a => a.value)] : []
@@ -381,7 +387,7 @@ export default {
         const macroPacks = this.packs.includes('Macro') ? [`${this.moduleName}.macros`] : []
         const playlistPacks = this.packs.includes('Playlist') ? [`${this.moduleName}.playlists`] : []
 
-        const scriptJS = Buffer.prototype.toString.call(data['scripts/init.js'], 'utf8')
+        let scriptJS = Buffer.prototype.toString.call(data['scripts/init.js'], 'utf8')
           .replace(/const adventureName = '.+';/, `const adventureName = '${this.escapeSingleQuotes(this.adventureName)}';`)
           .replace(/const moduleName = '.+';/, `const moduleName = '${this.moduleName}';`)
           .replace(/const welcomeJournal = '.+';/, `const welcomeJournal = '${this.escapeSingleQuotes(this.welcomeJournal)}';`)
@@ -391,6 +397,11 @@ export default {
           .replace(/const journalPacks = \[.+\];/, `const journalPacks = ${JSON.stringify(journalPacks)};`)
           .replace(/const macroPacks = \[.+\];/, `const macroPacks = ${JSON.stringify(macroPacks)};`)
           .replace(/const playlistPacks = \[.+\];/, `const playlistPacks = ${JSON.stringify(playlistPacks)};`)
+
+        if (!this.scenePackerIntegration) {
+          scriptJS = '// Module specific code goes here. See https://foundryvtt.com/article/module-development/ for help.'
+        }
+
         data['scripts/init.js'] = fflate.strToU8(scriptJS)
 
         const zipped = fflate.zipSync(data)

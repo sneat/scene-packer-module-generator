@@ -4,8 +4,9 @@
       {{ pageNotFound }}
     </h1>
     <h1 v-else>
-      {{ otherError }}
+      An error occurred, please open your browser console (<code>F12</code>) and report the error to <code>blair#9056</code> on the <a href="https://discord.com/invite/HY3xhBEf2A">Scene Packer Discord server</a>.
     </h1>
+    <hr>
     <NuxtLink to="/">
       Home page
     </NuxtLink>

@@ -11,7 +11,7 @@
         </v-card-title>
         <v-card-text>
           <p>This generator will help you create a <a href="https://foundryvtt.com/">Foundry VTT</a> module that is initialised with <a href="https://foundryvtt.com/packages/scene-packer">Scene Packer</a>.</p>
-          <!-- <p>Select whether you have an existing module that you want to incorporate Scene Packer into, or whether it's a new module that you are creating.</p> -->
+          <p>Select below to create a <code>New Module</code> with Scene Packer initialised, or a <code>Standalone Module</code> that has no integrations.</p>
           <p>
             The generator works entirely
             <NuxtLink to="/help">client-side</NuxtLink>, nothing is transferred to the server. Your secrets are safe with you! <NuxtLink to="/help">Need help?</NuxtLink>
@@ -26,6 +26,13 @@
           >
             Existing module
           </v-btn> -->
+          <v-btn
+            color="secondary"
+            nuxt
+            to="/standalone-module"
+          >
+            Standalone module
+          </v-btn>
           <v-spacer />
           <v-btn
             color="primary"
