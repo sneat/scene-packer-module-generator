@@ -11,7 +11,7 @@
           Fill in the form below to download a pre-configured module ready for you to enable in Foundry VTT.
         </v-card-text>
       </v-card>
-      <Form scene-packer-integration="true" />
+      <Form v-bind:scene-packer-integration="true" />
     </v-col>
   </v-row>
 </template>

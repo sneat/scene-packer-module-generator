@@ -3,7 +3,7 @@
     <v-card class="mb-3 py-4 d-flex justify-center">
       <v-card-text>
         <v-row>
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-text-field
               v-model.trim="adventureName"
               label="Adventure Name*"
@@ -13,7 +13,7 @@
               required
             />
           </v-col>
-          <v-col cols="6">
+          <v-col cols="12" md="6">
             <v-text-field
               v-model.trim="moduleName"
               label="Module Name*"
@@ -53,7 +53,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="4">
+          <v-col cols="12" md="4">
             <v-text-field
               v-model.trim="author"
               label="Author Name*"
@@ -63,7 +63,7 @@
               required
             />
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" md="4">
             <v-text-field
               v-model.trim="discord"
               label="Discord ID"
@@ -72,7 +72,7 @@
               :rules="[rules.discord]"
             />
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" md="4">
             <v-text-field
               v-model.trim="url"
               label="Module URL"
@@ -145,7 +145,8 @@
           <v-col
             v-for="(input, index) in additionalJournals"
             :key="`additionalJournal-${index}`"
-            cols="3"
+            cols="10"
+            md="3"
             class="py-0"
           >
             <v-text-field
@@ -195,7 +196,8 @@
           <v-col
             v-for="(input, index) in additionalMacros"
             :key="`additionalMacros-${index}`"
-            cols="3"
+            cols="10"
+            md="3"
             class="py-0"
           >
             <v-text-field
@@ -245,7 +247,8 @@
           <v-col
             v-for="(input, index) in creaturePacks"
             :key="`creaturePacks-${index}`"
-            cols="3"
+            cols="10"
+            md="3"
             class="py-0"
           >
             <v-text-field
