@@ -16,6 +16,7 @@
             The generator works entirely
             <NuxtLink to="/help">client-side</NuxtLink>, nothing is transferred to the server. Your secrets are safe with you! <NuxtLink to="/help">Need help?</NuxtLink>
           </p>
+          <p>If you are looking to create a <code>Shared Compendium Module</code> to share actors/items/journals between your worlds, select the <code>Standalone module</code> option below.</p>
           <hr class="my-3">
         </v-card-text>
         <v-card-actions>
