@@ -382,7 +382,7 @@ export default {
         }
         data['module.json'] = fflate.strToU8(JSON.stringify(moduleJSON, null, 2))
 
-        const creaturePacks = this.packs.includes('Actor') ? [`${this.moduleName}.actors`, ...this.creaturePacks.map(a => a.value)] : []
+        const creaturePacks = this.packs.includes('Actor') ? [`${this.moduleName}.actors`, ...this.creaturePacks.filter(a => a.value).map(a => a.value)] : []
         const journalPacks = this.packs.includes('JournalEntry') ? [`${this.moduleName}.journals`] : []
         const macroPacks = this.packs.includes('Macro') ? [`${this.moduleName}.macros`] : []
         const playlistPacks = this.packs.includes('Playlist') ? [`${this.moduleName}.playlists`] : []
