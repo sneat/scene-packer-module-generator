@@ -9,7 +9,7 @@
               label="Adventure Name*"
               placeholder="My cool adventure module"
               hint="The name of your adventure module as seen by end users."
-              :rules="[rules.required]"
+              :rules="[rules.required, rules.noBackslash]"
               required
             />
           </v-col>
@@ -332,9 +332,10 @@ export default {
       loader: null,
       rules: {
         required: value => !!value || 'Required.',
-        moduleName: value => value === slugify(value).toLowerCase() || 'All lowercase, no special characters, use hyphons instead of spaces.',
+        moduleName: value => value === slugify(value, { lower: true, remove: /[*+~.()'"!:@]/g }) || 'All lowercase, no special characters, use hyphons instead of spaces.',
         discord: value => !value || discordPattern.test(value) || 'Invalid Discord ID.',
-        url: value => !value || this.isURL(value) || 'Invalid Module URL.'
+        url: value => !value || this.isURL(value) || 'Invalid Module URL.',
+        noBackslash: value => !value.includes('\\') || 'Cannot use the "\\" character.'
       }
     }
   },
@@ -452,10 +453,10 @@ export default {
     },
     doSlug () {
       const moduleName = this.moduleName || this.adventureName
-      this.moduleName = slugify(moduleName).toLowerCase()
+      this.moduleName = slugify(moduleName, { lower: true, remove: /[*+~.()'"!:@]/g })
     },
     escapeSingleQuotes (str) {
-      return str.replace("'", "\\'").replace('\\', '\\\\')
+      return str.replace("'", "\\'")
     },
     isURL (str) {
       let url
