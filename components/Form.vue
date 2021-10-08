@@ -275,6 +275,57 @@
             </v-tooltip>
           </v-col>
         </v-row>
+        <v-row v-if="scenePackerIntegration">
+          <v-col cols="12" class="d-flex py-0">
+            <p>
+              List of Modules or Systems whose compendium packs can be searched within:
+              <v-tooltip top>
+                <template #activator="{ on, attrs }">
+                  <v-icon
+                    color="primary"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    mdi-help
+                  </v-icon>
+                </template>
+                <span>List any additional Module or System identifier to search within when searching for entities. The list is searched progressively, with your pack and any packs listed above being checked first.</span>
+              </v-tooltip>
+            </p>
+          </v-col>
+        </v-row>
+        <v-row v-if="scenePackerIntegration">
+          <v-col
+            v-for="(input, index) in additionalModulePacks"
+            :key="`additionalModulePacks-${index}`"
+            cols="10"
+            md="3"
+            class="py-0"
+          >
+            <v-text-field
+              v-model.trim="input.value"
+              label="Module name"
+              placeholder="dnd5e"
+              hint="The module or system identifier."
+              class="py-0"
+            />
+          </v-col>
+          <v-col cols="1">
+            <v-tooltip top>
+              <template #activator="{ on, attrs }">
+                <v-icon
+                  color="primary"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="addField(additionalModulePacks)"
+                >
+                  mdi-plus
+                </v-icon>
+              </template>
+              <span>Add another module to automatically search within.</span>
+            </v-tooltip>
+          </v-col>
+        </v-row>
       </v-card-text>
     </v-card>
     <v-card class="mb-3 py-4 d-flex justify-center">
@@ -326,6 +377,7 @@ export default {
       welcomeJournal: '',
       additionalJournals: [{ value: '' }],
       additionalMacros: [{ value: '' }],
+      additionalModulePacks: [{ value: '' }],
       creaturePacks: [{ value: 'dnd5e.monsters' }],
       isFormValid: false,
       processing: false,
@@ -397,6 +449,7 @@ export default {
           .replace(/const welcomeJournal = '.+';/, `const welcomeJournal = '${this.escapeSingleQuotes(this.welcomeJournal)}';`)
           .replace(/const additionalJournals = \[.+\];/, `const additionalJournals = ${JSON.stringify(this.additionalJournals.filter(j => j.value).map(j => j.value))};`)
           .replace(/const additionalMacros = \[.+\];/, `const additionalMacros = ${JSON.stringify(this.additionalMacros.filter(j => j.value).map(j => j.value))};`)
+          .replace(/const additionalModulePacks = \[.+\];/, `const additionalModulePacks = ${JSON.stringify(this.additionalModulePacks.filter(j => j.value).map(j => j.value))};`)
           .replace(/const creaturePacks = \[.+\];/, `const creaturePacks = ${JSON.stringify(creaturePacks)};`)
           .replace(/const journalPacks = \[.+\];/, `const journalPacks = ${JSON.stringify(journalPacks)};`)
           .replace(/const macroPacks = \[.+\];/, `const macroPacks = ${JSON.stringify(macroPacks)};`)
