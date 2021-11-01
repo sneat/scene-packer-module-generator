@@ -8,7 +8,9 @@
       </v-card>
       <v-card class="mb-3 py-4 d-flex justify-center">
         <v-card-text>
-          Fill in the form below to download a pre-configured module ready for you to enable in Foundry VTT. You can use this as a shortcut to creating your own <a href="https://foundryvtt.com/article/module-development/">Foundry VTT module</a>.
+          Fill in the form below to download a pre-configured module ready for you to enable in Foundry VTT.
+          Simply extract the zip file into the <a href="https://foundryvtt.com/article/configuration/#where-user-data" target="_blank">modules</a> directory of your Foundry instance.
+          You can use this as a shortcut to creating your own <a href="https://foundryvtt.com/article/module-development/">Foundry VTT module</a>.
         </v-card-text>
       </v-card>
       <Form />
