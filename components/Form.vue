@@ -407,9 +407,14 @@ export default {
       try {
         const defaultModuleBuffer = await fetch('https://scene-packer-module-generator.herokuapp.com/https://github.com/sneat/starter-scene-packer/releases/latest/download/starter-scene-packer.zip')
         const defaultModule = new Uint8Array(await defaultModuleBuffer.arrayBuffer())
-        const data = fflate.unzipSync(defaultModule)
+        const data = {}
 
-        const moduleJSON = JSON.parse(Buffer.prototype.toString.call(data['module.json'], 'utf8'))
+        // Ensure that all of the files are in a directory with the same name as the module.
+        for (const [key, value] of Object.entries(fflate.unzipSync(defaultModule))) {
+          data[`${this.moduleName}/${key}`] = value
+        }
+
+        const moduleJSON = JSON.parse(Buffer.prototype.toString.call(data[`${this.moduleName}/module.json`], 'utf8'))
         moduleJSON.author = this.author
         const authorDetails = {
           name: this.author
@@ -436,14 +441,14 @@ export default {
         if (!this.scenePackerIntegration) {
           moduleJSON.dependencies = []
         }
-        data['module.json'] = fflate.strToU8(JSON.stringify(moduleJSON, null, 2))
+        data[`${this.moduleName}/module.json`] = fflate.strToU8(JSON.stringify(moduleJSON, null, 2))
 
         const creaturePacks = this.packs.includes('Actor') ? [`${this.moduleName}.actors`, ...this.creaturePacks.filter(a => a.value).map(a => a.value)] : []
         const journalPacks = this.packs.includes('JournalEntry') ? [`${this.moduleName}.journals`] : []
         const macroPacks = this.packs.includes('Macro') ? [`${this.moduleName}.macros`] : []
         const playlistPacks = this.packs.includes('Playlist') ? [`${this.moduleName}.playlists`] : []
 
-        let scriptJS = Buffer.prototype.toString.call(data['scripts/init.js'], 'utf8')
+        let scriptJS = Buffer.prototype.toString.call(data[`${this.moduleName}/scripts/init.js`], 'utf8')
           .replace(/const adventureName = '.+';/, `const adventureName = '${this.escapeSingleQuotes(this.adventureName)}';`)
           .replace(/const moduleName = '.+';/, `const moduleName = '${this.moduleName}';`)
           .replace(/const welcomeJournal = '.+';/, `const welcomeJournal = '${this.escapeSingleQuotes(this.welcomeJournal)}';`)
@@ -459,7 +464,7 @@ export default {
           scriptJS = '// Module specific code goes here. See https://foundryvtt.com/article/module-development/ for help.'
         }
 
-        data['scripts/init.js'] = fflate.strToU8(scriptJS)
+        data[`${this.moduleName}/scripts/init.js`] = fflate.strToU8(scriptJS)
 
         const zipped = fflate.zipSync(data)
         const blob = await new Response(zipped).blob()
