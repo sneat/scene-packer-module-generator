@@ -32,7 +32,7 @@
     "eslint": "^8.3.0",
     "eslint-plugin-nuxt": "^3.1.0",
     "eslint-plugin-vue": "^7.19.1",
-    "jest": "^27.4.3",
+    "jest": "^27.4.4",
     "ts-jest": "^27.0.7",
     "vue-jest": "^3.0.4"
   }
