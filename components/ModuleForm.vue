@@ -6,23 +6,23 @@
           <v-col cols="12" md="6">
             <v-text-field
               v-model.trim="adventureName"
-              @keyup="generateModuleName"
               label="Adventure Name*"
               placeholder="My cool adventure module"
               hint="The name of your adventure module as seen by end users."
               :rules="[rules.required, rules.noBackslash]"
               required
+              @keyup="generateModuleName"
             />
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
               v-model.trim="moduleName"
-              @keyup="markModuleNameAsManual"
               label="Module Name*"
               placeholder="my-cool-adventure-module"
               hint="All lowercase, no special characters, use hyphens instead of spaces or periods."
               :rules="[rules.required, rules.moduleName]"
               required
+              @keyup="markModuleNameAsManual"
             >
               <template #append-outer>
                 <v-tooltip
@@ -513,13 +513,13 @@ export default {
       }, 200)
     },
     generateModuleName () {
-      if (!this.moduleNameAutomatic) return
+      if (!this.moduleNameAutomatic) { return }
       this.doSlug(null, true)
     },
     markModuleNameAsManual () {
       this.moduleNameAutomatic = false
     },
-    doSlug (event, force = false) {
+    doSlug (_, force = false) {
       const moduleName = force ? this.adventureName : this.moduleName || this.adventureName
       this.moduleName = slugify(moduleName, { lower: true, remove: /[*+~.()'"!:@]/g })
     },

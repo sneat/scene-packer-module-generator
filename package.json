@@ -2,6 +2,7 @@
   "name": "scene-packer-module-generator",
   "version": "1.0.0",
   "private": true,
+  "license": "SEE LICENSE FILE",
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
@@ -31,7 +32,7 @@
     "babel-jest": "^27.4.5",
     "eslint": "^8.5.0",
     "eslint-plugin-nuxt": "^3.1.0",
-    "eslint-plugin-vue": "^7.19.1",
+    "eslint-plugin-vue": "^8.2.0",
     "jest": "^27.4.5",
     "ts-jest": "^27.1.2",
     "vue-jest": "^3.0.4"

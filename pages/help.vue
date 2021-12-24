@@ -16,7 +16,7 @@
       </v-card>
       <v-card class="v-card mb-3 py-4 text-center">
         <v-card-text>
-          <Logo />
+          <ScenePackerLogo />
           <p>You can contact me on Discord <code>blair#9056</code> in the <a href="https://discord.com/invite/HY3xhBEf2A">Scene Packer server</a> or the <code>Foundry VTT server</code> if you have questions, comments, queries, suggestions etc.</p>
         </v-card-text>
       </v-card>

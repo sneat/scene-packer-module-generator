@@ -13,7 +13,7 @@
           You can use this as a shortcut to creating your own <a href="https://foundryvtt.com/article/module-development/">Foundry VTT module</a>.
         </v-card-text>
       </v-card>
-      <Form />
+      <ModuleForm />
     </v-col>
   </v-row>
 </template>

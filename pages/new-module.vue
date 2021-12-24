@@ -12,7 +12,7 @@
           Simply extract the zip file into the <a href="https://foundryvtt.com/article/configuration/#where-user-data" target="_blank">modules</a> directory of your Foundry instance.
         </v-card-text>
       </v-card>
-      <Form v-bind:scene-packer-integration="true" />
+      <ModuleForm :scene-packer-integration="true" />
     </v-col>
   </v-row>
 </template>
