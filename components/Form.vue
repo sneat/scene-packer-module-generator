@@ -6,6 +6,7 @@
           <v-col cols="12" md="6">
             <v-text-field
               v-model.trim="adventureName"
+              @keyup="generateModuleName"
               label="Adventure Name*"
               placeholder="My cool adventure module"
               hint="The name of your adventure module as seen by end users."
@@ -16,9 +17,10 @@
           <v-col cols="12" md="6">
             <v-text-field
               v-model.trim="moduleName"
+              @keyup="markModuleNameAsManual"
               label="Module Name*"
               placeholder="my-cool-adventure-module"
-              hint="All lowercase, no special characters, use hyphons instead of spaces or periods."
+              hint="All lowercase, no special characters, use hyphens instead of spaces or periods."
               :rules="[rules.required, rules.moduleName]"
               required
             >
@@ -381,6 +383,7 @@ export default {
       creaturePacks: [{ value: 'dnd5e.monsters' }],
       isFormValid: false,
       processing: false,
+      moduleNameAutomatic: true,
       loader: null,
       rules: {
         required: value => !!value || 'Required.',
@@ -509,8 +512,15 @@ export default {
         URL.revokeObjectURL(blobURL)
       }, 200)
     },
-    doSlug () {
-      const moduleName = this.moduleName || this.adventureName
+    generateModuleName () {
+      if (!this.moduleNameAutomatic) return
+      this.doSlug(null, true)
+    },
+    markModuleNameAsManual () {
+      this.moduleNameAutomatic = false
+    },
+    doSlug (event, force = false) {
+      const moduleName = force ? this.adventureName : this.moduleName || this.adventureName
       this.moduleName = slugify(moduleName, { lower: true, remove: /[*+~.()'"!:@]/g })
     },
     escapeSingleQuotes (str) {
