@@ -16,7 +16,7 @@
     "core-js": "^3.19.2",
     "fflate": "^0.7.2",
     "nuxt": "^2.15.7",
-    "slugify": "^1.6.3",
+    "slugify": "^1.6.4",
     "vuetify": "^2.6.1"
   },
   "devDependencies": {
