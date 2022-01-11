@@ -363,13 +363,13 @@ import * as slugify from 'slugify'
 
 const discordPattern = /^[^#@:]{2,32}#[0-9]{4}$/
 const packOptions = [
-  {type: 'Actor', name: 'actors'},
-  {type: 'Item', name: 'items'},
-  {type: 'JournalEntry', name: 'journals'},
-  {type: 'Macro', name: 'macros'},
-  {type: 'Scene', name: 'maps'},
-  {type: 'Playlist', name: 'playlists'},
-  {type: 'RollTable', name: 'rolltables'},
+  { type: 'Actor', name: 'actors' },
+  { type: 'Item', name: 'items' },
+  { type: 'JournalEntry', name: 'journals' },
+  { type: 'Macro', name: 'macros' },
+  { type: 'Scene', name: 'maps' },
+  { type: 'Playlist', name: 'playlists' },
+  { type: 'RollTable', name: 'rolltables' }
 ]
 
 export default {
@@ -451,7 +451,7 @@ export default {
         moduleJSON.packs.forEach((pack) => {
           pack.label = this.adventureName
         })
-        packOptions.forEach(pack => {
+        packOptions.forEach((pack) => {
           if (!this.packs.includes(pack.type)) {
             delete data[`test/packs/${pack.name}.db`]
           }
