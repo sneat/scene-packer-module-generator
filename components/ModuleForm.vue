@@ -466,13 +466,18 @@ export default {
         const macroPacks = this.packs.includes('Macro') ? [`${this.moduleName}.macros`] : []
         const playlistPacks = this.packs.includes('Playlist') ? [`${this.moduleName}.playlists`] : []
 
+        const modulePacks = this.additionalModulePacks.filter(j => j.value).map(j => j.value)
+        if (!modulePacks.includes(this.moduleName)) {
+          modulePacks.unshift(this.moduleName)
+        }
+
         let scriptJS = Buffer.prototype.toString.call(data[`${this.moduleName}/scripts/init.js`], 'utf8')
           .replace(/const adventureName = '.+';/, `const adventureName = '${this.escapeSingleQuotes(this.adventureName)}';`)
           .replace(/const moduleName = '.+';/, `const moduleName = '${this.moduleName}';`)
           .replace(/const welcomeJournal = '.+';/, `const welcomeJournal = '${this.escapeSingleQuotes(this.welcomeJournal)}';`)
           .replace(/const additionalJournals = \[.+\];/, `const additionalJournals = ${JSON.stringify(this.additionalJournals.filter(j => j.value).map(j => j.value))};`)
           .replace(/const additionalMacros = \[.+\];/, `const additionalMacros = ${JSON.stringify(this.additionalMacros.filter(j => j.value).map(j => j.value))};`)
-          .replace(/const additionalModulePacks = \[.+\];/, `const additionalModulePacks = ${JSON.stringify(this.additionalModulePacks.filter(j => j.value).map(j => j.value))};`)
+          .replace(/const additionalModulePacks = \[.+\];/, `const additionalModulePacks = ${JSON.stringify(modulePacks)};`)
           .replace(/const creaturePacks = \[.+\];/, `const creaturePacks = ${JSON.stringify(creaturePacks)};`)
           .replace(/const journalPacks = \[.+\];/, `const journalPacks = ${JSON.stringify(journalPacks)};`)
           .replace(/const macroPacks = \[.+\];/, `const macroPacks = ${JSON.stringify(macroPacks)};`)
