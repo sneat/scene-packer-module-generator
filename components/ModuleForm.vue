@@ -111,7 +111,22 @@
             <v-checkbox v-model="packs" class="px-2 pt-0" label="Items" value="Item" />
             <v-checkbox v-model="packs" class="px-2 pt-0" label="Roll Tables" value="RollTable" />
             <v-checkbox v-model="packs" class="px-2 pt-0" label="Macros" value="Macro" />
+            <v-checkbox v-model="packs" class="px-2 pt-0" label="Cards" value="Card" />
             <v-checkbox v-model="packs" class="px-2 pt-0" label="Playlists" value="Playlist" />
+          </v-col>
+        </v-row>
+        <v-row v-if="requiresSystem">
+          <v-col cols="12" class="d-flex py-0">
+            <p>
+              Foundry VTT version 10 and above now requires the <a href="https://foundryvtt.com/packages/systems" target="_blank">system</a> be specified for Actor and Item compendium packs.
+              <v-text-field
+                v-model.trim="system"
+                label="System*"
+                placeholder="dnd5e"
+                hint="Must be the id format, not the label of the system (e.g. pf2e rather than Pathfinder Second Edition)."
+                :rules="[rules.system]"
+              />
+            </p>
           </v-col>
         </v-row>
         <v-row v-if="scenePackerIntegration">
@@ -364,6 +379,7 @@ import * as slugify from 'slugify'
 const discordPattern = /^[^#@:]{2,32}#[0-9]{4}$/
 const packOptions = [
   { type: 'Actor', name: 'actors' },
+  { type: 'Card', name: 'cards' },
   { type: 'Item', name: 'items' },
   { type: 'JournalEntry', name: 'journals' },
   { type: 'Macro', name: 'macros' },
@@ -385,8 +401,9 @@ export default {
       discord: '',
       patreon: '',
       url: '',
-      packs: ['Scene', 'Actor', 'JournalEntry', 'Item', 'RollTable', 'Macro', 'Playlist'],
+      packs: ['Scene', 'Actor', 'JournalEntry', 'Item', 'RollTable', 'Macro', 'Card', 'Playlist'],
       welcomeJournal: '',
+      system: '',
       additionalJournals: [{ value: '' }],
       additionalMacros: [{ value: '' }],
       additionalModulePacks: [{ value: '' }],
@@ -400,8 +417,14 @@ export default {
         moduleName: value => value === slugify(value, { lower: true, remove: /[*+~.()'"!:@]/g }) || 'All lowercase, no special characters, use hyphons instead of spaces.',
         discord: value => !value || discordPattern.test(value) || 'Invalid Discord ID.',
         url: value => !value || this.isURL(value) || 'Invalid Module URL.',
-        noBackslash: value => !value.includes('\\') || 'Cannot use the "\\" character.'
+        noBackslash: value => !value.includes('\\') || 'Cannot use the "\\" character.',
+        system: value => !this.requiresSystem || (value && value === slugify(value, { lower: true, remove: /[*+~.()'"!:@]/g })) || 'Required when an Actor or Item compendium is used.'
       }
+    }
+  },
+  computed: {
+    requiresSystem () {
+      return this.packs.includes('Actor') || this.packs.includes('Item')
     }
   },
   watch: {
@@ -422,7 +445,7 @@ export default {
         const defaultModule = new Uint8Array(await defaultModuleBuffer.arrayBuffer())
         const data = {}
 
-        // Ensure that all of the files are in a directory with the same name as the module.
+        // Ensure that all the files are in a directory with the same name as the module.
         for (const [key, value] of Object.entries(fflate.unzipSync(defaultModule))) {
           data[`${this.moduleName}/${key}`] = value
         }
@@ -441,6 +464,7 @@ export default {
         moduleJSON.authors = [authorDetails]
         moduleJSON.title = this.adventureName
         moduleJSON.description = this.description
+        moduleJSON.id = this.moduleName
         moduleJSON.name = this.moduleName
         moduleJSON.version = '1.0.0'
         moduleJSON.url = this.url
@@ -450,6 +474,9 @@ export default {
         moduleJSON.packs = moduleJSON.packs.filter(pack => this.packs.includes(pack.entity))
         moduleJSON.packs.forEach((pack) => {
           pack.label = this.adventureName
+          if (this.system && (pack.type === 'Actor' || pack.type === 'Item')) {
+            pack.system = this.system
+          }
         })
         packOptions.forEach((pack) => {
           if (!this.packs.includes(pack.type)) {
@@ -457,7 +484,8 @@ export default {
           }
         })
         if (!this.scenePackerIntegration) {
-          moduleJSON.dependencies = []
+          delete moduleJSON.dependencies
+          delete moduleJSON.relationships
         }
         data[`${this.moduleName}/module.json`] = fflate.strToU8(JSON.stringify(moduleJSON, null, 2))
 
@@ -518,7 +546,7 @@ export default {
       tempLink.style.display = 'none'
       tempLink.setAttribute('href', blobURL)
       tempLink.setAttribute('download', filename)
-      // Safari thinks _blank anchor are pop ups. We only want to set _blank
+      // Safari thinks _blank anchor are pop-ups. We only want to set _blank
       // target if the browser does not support the HTML5 download attribute.
       // This allows you to download files in desktop safari if pop up blocking
       // is enabled.
