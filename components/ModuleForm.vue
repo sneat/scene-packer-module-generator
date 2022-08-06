@@ -103,16 +103,84 @@
             </p>
           </v-col>
         </v-row>
-        <v-row class="mt-0">
-          <v-col cols="12" class="d-flex flex-wrap pt-0">
-            <v-checkbox v-model="packs" class="px-2 pt-0" label="Scenes" value="Scene" />
-            <v-checkbox v-model="packs" class="px-2 pt-0" label="Actors" value="Actor" />
-            <v-checkbox v-model="packs" class="px-2 pt-0" label="Journals" value="JournalEntry" />
-            <v-checkbox v-model="packs" class="px-2 pt-0" label="Items" value="Item" />
-            <v-checkbox v-model="packs" class="px-2 pt-0" label="Roll Tables" value="RollTable" />
-            <v-checkbox v-model="packs" class="px-2 pt-0" label="Macros" value="Macro" />
-            <v-checkbox v-model="packs" class="px-2 pt-0" label="Cards" value="Card" />
-            <v-checkbox v-model="packs" class="px-2 pt-0" label="Playlists" value="Playlist" />
+        <v-row>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-checkbox v-model="packs" value="Scene" />
+            <v-text-field
+              v-model.trim="sceneLabel"
+              label="Scenes"
+              :placeholder="adventureName"
+              :hint="packHint"
+            />
+          </v-col>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-checkbox v-model="packs" value="Actor" />
+            <v-text-field
+              v-model.trim="actorLabel"
+              label="Actors"
+              :placeholder="adventureName"
+              :hint="packHint"
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-checkbox v-model="packs" value="JournalEntry" />
+            <v-text-field
+              v-model.trim="journalLabel"
+              label="Journals"
+              :placeholder="adventureName"
+              :hint="packHint"
+            />
+          </v-col>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-checkbox v-model="packs" value="Item" />
+            <v-text-field
+              v-model.trim="itemLabel"
+              label="Items"
+              :placeholder="adventureName"
+              :hint="packHint"
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-checkbox v-model="packs" value="RollTable" />
+            <v-text-field
+              v-model.trim="rollLabel"
+              label="Roll Tables"
+              :placeholder="adventureName"
+              :hint="packHint"
+            />
+          </v-col>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-checkbox v-model="packs" value="Macro" />
+            <v-text-field
+              v-model.trim="macroLabel"
+              label="Macros"
+              :placeholder="adventureName"
+              :hint="packHint"
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-checkbox v-model="packs" value="Card" />
+            <v-text-field
+              v-model.trim="cardLabel"
+              label="Cards"
+              :placeholder="adventureName"
+              :hint="packHint"
+            />
+          </v-col>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-checkbox v-model="packs" value="Playlist" />
+            <v-text-field
+              v-model.trim="playlistLabel"
+              label="Playlists"
+              :placeholder="adventureName"
+              :hint="packHint"
+            />
           </v-col>
         </v-row>
         <v-row v-if="requiresSystem">
@@ -408,6 +476,15 @@ export default {
       additionalMacros: [{ value: '' }],
       additionalModulePacks: [{ value: '' }],
       creaturePacks: [{ value: 'dnd5e.monsters' }],
+      actorLabel: '',
+      cardLabel: '',
+      itemLabel: '',
+      journalLabel: '',
+      macroLabel: '',
+      sceneLabel: '',
+      playlistLabel: '',
+      rollLabel: '',
+      packHint: 'Optional. If you want the label to be something other than the adventure name, enter it here.',
       isFormValid: false,
       processing: false,
       moduleNameAutomatic: true,
@@ -474,6 +551,9 @@ export default {
         moduleJSON.packs = moduleJSON.packs.filter(pack => this.packs.includes(pack.entity))
         moduleJSON.packs.forEach((pack) => {
           pack.label = this.adventureName
+          if (this[`${pack.type.toLowerCase()}Label`]) {
+            pack.label = this[`${pack.type.toLowerCase()}Label`]
+          }
           if (this.system && (pack.type === 'Actor' || pack.type === 'Item')) {
             pack.system = this.system
           }
