@@ -98,7 +98,8 @@
                     mdi-help
                   </v-icon>
                 </template>
-                <span>Choose the compendium packs that you want your module to contain.</span>
+                <span>Choose the compendium packs that you want your module to contain.
+                  You can specify a different label for each pack (the default value is the name of the module).</span>
               </v-tooltip>
             </p>
           </v-col>
@@ -182,11 +183,29 @@
               :hint="packHint"
             />
           </v-col>
+          <v-col cols="12" md="6" class="d-flex">
+            <v-checkbox v-model="packs" value="Adventure" />
+            <v-text-field
+              v-model.trim="adventureLabel"
+              label="Adventure"
+              :placeholder="adventureName"
+              :hint="packHint"
+            />
+          </v-col>
+        </v-row>
+        <v-row v-if="includesAdventure">
+          <v-col cols="12" class="d-flex py-0">
+            <v-alert outlined dense type="warning">
+              <code>Adventure packs</code> are only supported in Foundry VTT version 10 and above. Selecting
+              an <code>Adventure pack</code> pack will set your module's minimum supported version to version 10.
+            </v-alert>
+          </v-col>
         </v-row>
         <v-row v-if="requiresSystem">
           <v-col cols="12" class="d-flex py-0">
             <p>
-              Foundry VTT version 10 and above now requires the <a href="https://foundryvtt.com/packages/systems" target="_blank">system</a> be specified for Actor and Item compendium packs.
+              Foundry VTT version 10 and above now requires the <a href="https://foundryvtt.com/packages/systems" target="_blank">system</a>
+              to be specified for Actor and Item compendium packs.
               <v-text-field
                 v-model.trim="system"
                 label="System*"
@@ -446,14 +465,42 @@ import * as slugify from 'slugify'
 
 const discordPattern = /^[^#@:]{2,32}#[0-9]{4}$/
 const packOptions = [
-  { type: 'Actor', name: 'actors' },
-  { type: 'Card', name: 'cards' },
-  { type: 'Item', name: 'items' },
-  { type: 'JournalEntry', name: 'journals' },
-  { type: 'Macro', name: 'macros' },
-  { type: 'Scene', name: 'maps' },
-  { type: 'Playlist', name: 'playlists' },
-  { type: 'RollTable', name: 'rolltables' }
+  {
+    type: 'Actor',
+    name: 'actors'
+  },
+  {
+    type: 'Adventure',
+    name: 'adventure'
+  },
+  {
+    type: 'Cards',
+    name: 'cards'
+  },
+  {
+    type: 'Item',
+    name: 'items'
+  },
+  {
+    type: 'JournalEntry',
+    name: 'journals'
+  },
+  {
+    type: 'Macro',
+    name: 'macros'
+  },
+  {
+    type: 'Scene',
+    name: 'maps'
+  },
+  {
+    type: 'Playlist',
+    name: 'playlists'
+  },
+  {
+    type: 'RollTable',
+    name: 'rolltables'
+  }
 ]
 
 export default {
@@ -469,7 +516,7 @@ export default {
       discord: '',
       patreon: '',
       url: '',
-      packs: ['Scene', 'Actor', 'JournalEntry', 'Item', 'RollTable', 'Macro', 'Card', 'Playlist'],
+      packs: ['Actor', 'Cards', 'Item', 'JournalEntry', 'Macro', 'Playlist', 'RollTable', 'Scene'],
       welcomeJournal: '',
       system: '',
       additionalJournals: [{ value: '' }],
@@ -483,6 +530,7 @@ export default {
       macroLabel: '',
       sceneLabel: '',
       playlistLabel: '',
+      adventureLabel: '',
       rollLabel: '',
       packHint: 'Optional. If you want the label to be something other than the adventure name, enter it here.',
       isFormValid: false,
@@ -491,7 +539,7 @@ export default {
       loader: null,
       rules: {
         required: value => !!value || 'Required.',
-        moduleName: value => value === slugify(value, { lower: true, remove: /[*+~.()'"!:@]/g }) || 'All lowercase, no special characters, use hyphons instead of spaces.',
+        moduleName: value => value === slugify(value, { lower: true, remove: /[*+~.()'"!:@]/g }) || 'All lowercase, no special characters, use hyphens instead of spaces.',
         discord: value => !value || discordPattern.test(value) || 'Invalid Discord ID.',
         url: value => !value || this.isURL(value) || 'Invalid Module URL.',
         noBackslash: value => !value.includes('\\') || 'Cannot use the "\\" character.',
@@ -500,6 +548,9 @@ export default {
     }
   },
   computed: {
+    includesAdventure () {
+      return this.packs.includes('Adventure')
+    },
     requiresSystem () {
       return this.packs.includes('Actor') || this.packs.includes('Item')
     }
@@ -554,13 +605,13 @@ export default {
           if (this[`${pack.type.toLowerCase()}Label`]) {
             pack.label = this[`${pack.type.toLowerCase()}Label`]
           }
-          if (this.system && (pack.type === 'Actor' || pack.type === 'Item')) {
+          if (this.system && (pack.type === 'Actor' || pack.type === 'Item' || pack.type === 'Adventure')) {
             pack.system = this.system
           }
         })
         packOptions.forEach((pack) => {
           if (!this.packs.includes(pack.type)) {
-            delete data[`test/packs/${pack.name}.db`]
+            delete data[`${this.moduleName}/packs/${pack.name}.db`]
           }
         })
         if (!this.scenePackerIntegration) {
@@ -579,23 +630,35 @@ export default {
           modulePacks.unshift(this.moduleName)
         }
 
+        if (this.includesAdventure) {
+          // Adventure documents require v10+ so we can clean up older data values along with setting the minimum version.
+          delete moduleJSON.minimumCoreVersion
+          delete moduleJSON.compatibleCoreVersion
+          moduleJSON.compatibility.minimum = '10'
+
+          delete moduleJSON.name
+          delete moduleJSON.author
+          delete moduleJSON.dependencies
+        }
+
         let scriptJS = Buffer.prototype.toString.call(data[`${this.moduleName}/scripts/init.js`], 'utf8')
           .replace(/const adventureName = '.+';/, `const adventureName = '${this.escapeSingleQuotes(this.adventureName)}';`)
           .replace(/const moduleName = '.+';/, `const moduleName = '${this.moduleName}';`)
           .replace(/const welcomeJournal = '.+';/, `const welcomeJournal = '${this.escapeSingleQuotes(this.welcomeJournal)}';`)
-          .replace(/const additionalJournals = \[.+\];/, `const additionalJournals = ${JSON.stringify(this.additionalJournals.filter(j => j.value).map(j => j.value))};`)
-          .replace(/const additionalMacros = \[.+\];/, `const additionalMacros = ${JSON.stringify(this.additionalMacros.filter(j => j.value).map(j => j.value))};`)
-          .replace(/const additionalModulePacks = \[.+\];/, `const additionalModulePacks = ${JSON.stringify(modulePacks)};`)
-          .replace(/const creaturePacks = \[.+\];/, `const creaturePacks = ${JSON.stringify(creaturePacks)};`)
-          .replace(/const journalPacks = \[.+\];/, `const journalPacks = ${JSON.stringify(journalPacks)};`)
-          .replace(/const macroPacks = \[.+\];/, `const macroPacks = ${JSON.stringify(macroPacks)};`)
-          .replace(/const playlistPacks = \[.+\];/, `const playlistPacks = ${JSON.stringify(playlistPacks)};`)
+          .replace(/const additionalJournals = \[.+];/, `const additionalJournals = ${JSON.stringify(this.additionalJournals.filter(j => j.value).map(j => j.value))};`)
+          .replace(/const additionalMacros = \[.+];/, `const additionalMacros = ${JSON.stringify(this.additionalMacros.filter(j => j.value).map(j => j.value))};`)
+          .replace(/const additionalModulePacks = \[.+];/, `const additionalModulePacks = ${JSON.stringify(modulePacks)};`)
+          .replace(/const creaturePacks = \[.+];/, `const creaturePacks = ${JSON.stringify(creaturePacks)};`)
+          .replace(/const journalPacks = \[.+];/, `const journalPacks = ${JSON.stringify(journalPacks)};`)
+          .replace(/const macroPacks = \[.+];/, `const macroPacks = ${JSON.stringify(macroPacks)};`)
+          .replace(/const playlistPacks = \[.+];/, `const playlistPacks = ${JSON.stringify(playlistPacks)};`)
 
         if (!this.scenePackerIntegration) {
           scriptJS = '// Module specific code goes here. See https://foundryvtt.com/article/module-development/ for help.'
         }
 
         data[`${this.moduleName}/scripts/init.js`] = fflate.strToU8(scriptJS)
+        data[`${this.moduleName}/module.json`] = fflate.strToU8(JSON.stringify(moduleJSON, null, 2))
 
         const zipped = fflate.zipSync(data)
         const blob = await new Response(zipped).blob()
@@ -611,11 +674,11 @@ export default {
       const filename = `${this.moduleName}.zip`
 
       if (typeof window.navigator.msSaveBlob !== 'undefined') {
-      // IE doesn't allow using a blob object directly as link href.
-      // Workaround for "HTML7007: One or more blob URLs were
-      // revoked by closing the blob for which they were created.
-      // These URLs will no longer resolve as the data backing
-      // the URL has been freed."
+        // IE doesn't allow using a blob object directly as link href.
+        // Workaround for "HTML7007: One or more blob URLs were
+        // revoked by closing the blob for which they were created.
+        // These URLs will no longer resolve as the data backing
+        // the URL has been freed."
         window.navigator.msSaveBlob(blob, filename)
         return
       }
@@ -636,12 +699,14 @@ export default {
       tempLink.click()
 
       setTimeout(() => {
-      // For Firefox it is necessary to delay revoking the ObjectURL
+        // For Firefox, it is necessary to delay revoking the ObjectURL
         URL.revokeObjectURL(blobURL)
       }, 200)
     },
     generateModuleName () {
-      if (!this.moduleNameAutomatic) { return }
+      if (!this.moduleNameAutomatic) {
+        return
+      }
       this.doSlug(null, true)
     },
     markModuleNameAsManual () {
