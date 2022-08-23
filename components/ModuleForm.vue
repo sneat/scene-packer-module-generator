@@ -166,7 +166,7 @@
         </v-row>
         <v-row>
           <v-col cols="12" md="6" class="d-flex">
-            <v-checkbox v-model="packs" value="Card" />
+            <v-checkbox v-model="packs" value="Cards" />
             <v-text-field
               v-model.trim="cardLabel"
               label="Cards"
