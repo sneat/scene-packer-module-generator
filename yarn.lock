@@ -2654,10 +2654,10 @@
   optionalDependencies:
     prettier "^1.18.2"
 
-"@vue/test-utils@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-2.1.0.tgz#c2f646aa2d6ac779f79a83f18c5b82fc40952bfd"
-  integrity sha512-U4AxAD/tKJ3ajxYew1gkfEotpr96DE/gLXpbl+nPbsNRqGBfQZZA7YhwGoQNDPgon56v+IGZDrYq7pe3GDl9aw==
+"@vue/test-utils@^2.2.7":
+  version "2.2.7"
+  resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-2.2.7.tgz#0d93d635031a4cca2de70b825aef3fe20a41e702"
+  integrity sha512-BMuoruUFTEqhLoOgsMcgNVMiByYbfHCKGr2C4CPdGtz/affUtDVX5zr1RnPuq0tYSiaqq+Enw5voUpG6JY8Q7g==
 
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
