@@ -456,44 +456,6 @@ import * as fflate from 'fflate'
 import * as slugify from 'slugify'
 
 const discordPattern = /^[^#@:]{2,32}#[0-9]{4}$/
-const packOptions = [
-  {
-    type: 'Actor',
-    name: 'actors'
-  },
-  {
-    type: 'Adventure',
-    name: 'adventure'
-  },
-  {
-    type: 'Cards',
-    name: 'cards'
-  },
-  {
-    type: 'Item',
-    name: 'items'
-  },
-  {
-    type: 'JournalEntry',
-    name: 'journals'
-  },
-  {
-    type: 'Macro',
-    name: 'macros'
-  },
-  {
-    type: 'Scene',
-    name: 'maps'
-  },
-  {
-    type: 'Playlist',
-    name: 'playlists'
-  },
-  {
-    type: 'RollTable',
-    name: 'rolltables'
-  }
-]
 
 export default {
   props: {
@@ -606,7 +568,7 @@ export default {
           const allowedPackNames = new Set(moduleJSON.packs.map(p => p.name))
           const prune = (folders) => {
             return folders
-              .map(folder => {
+              .map((folder) => {
                 if (Array.isArray(folder.packs)) {
                   folder.packs = folder.packs.filter(p => allowedPackNames.has(p))
                 }
