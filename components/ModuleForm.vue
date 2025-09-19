@@ -193,19 +193,11 @@
             />
           </v-col>
         </v-row>
-        <v-row v-if="includesAdventure">
-          <v-col cols="12" class="d-flex py-0">
-            <v-alert outlined dense type="warning">
-              <code>Adventure packs</code> are only supported in Foundry VTT version 10 and above. Selecting
-              an <code>Adventure pack</code> pack will set your module's minimum supported version to version 10.
-            </v-alert>
-          </v-col>
-        </v-row>
         <v-row v-if="requiresSystem">
           <v-col cols="12" class="d-flex py-0">
             <p>
-              Foundry VTT version 10 and above now requires the <a href="https://foundryvtt.com/packages/systems" target="_blank">system</a>
-              to be specified for Actor and Item compendium packs.
+              Actor, Adventure, and Item packs require the <a href="https://foundryvtt.com/packages/systems" target="_blank">system</a>
+              to be specified.
               <v-text-field
                 v-model.trim="system"
                 label="System*"
@@ -514,9 +506,8 @@ export default {
       description: '',
       author: '',
       discord: '',
-      patreon: '',
       url: '',
-      packs: ['Actor', 'Cards', 'Item', 'JournalEntry', 'Macro', 'Playlist', 'RollTable', 'Scene'],
+      packs: ['Actor', 'Cards', 'Item', 'JournalEntry', 'Macro', 'Playlist', 'RollTable', 'Scene', 'Adventure'],
       welcomeJournal: '',
       system: '',
       additionalJournals: [{ value: '' }],
@@ -543,7 +534,7 @@ export default {
         discord: value => !value || discordPattern.test(value) || 'Invalid Discord ID.',
         url: value => !value || this.isURL(value) || 'Invalid Module URL.',
         noBackslash: value => !value.includes('\\') || 'Cannot use the "\\" character.',
-        system: value => !this.requiresSystem || (value && value === slugify(value, { lower: true, remove: /[*+~.()'"!:@]/g })) || 'Required when an Actor or Item compendium is used.'
+        system: value => !this.requiresSystem || (value && value === slugify(value, { lower: true, remove: /[*+~.()'"!:@]/g })) || 'Required when an Actor, Adventure, or Item compendium is used.'
       }
     }
   },
@@ -552,7 +543,7 @@ export default {
       return this.packs.includes('Adventure')
     },
     requiresSystem () {
-      return this.packs.includes('Actor') || this.packs.includes('Item')
+      return this.packs.includes('Actor') || this.packs.includes('Adventure') || this.packs.includes('Item')
     }
   },
   watch: {
@@ -579,27 +570,29 @@ export default {
         }
 
         const moduleJSON = JSON.parse(Buffer.prototype.toString.call(data[`${this.moduleName}/module.json`], 'utf8'))
-        moduleJSON.author = this.author
         const authorDetails = {
           name: this.author
         }
-        if (this.patreon) {
-          authorDetails.patreon = this.patreon
-        }
         if (this.discord) {
           authorDetails.discord = this.discord
+        }
+        if (this.url) {
+          authorDetails.url = this.url
         }
         moduleJSON.authors = [authorDetails]
         moduleJSON.title = this.adventureName
         moduleJSON.description = this.description
         moduleJSON.id = this.moduleName
-        moduleJSON.name = this.moduleName
         moduleJSON.version = '1.0.0'
         moduleJSON.url = this.url
         moduleJSON.download = ''
         moduleJSON.manifest = ''
-        delete moduleJSON.media
-        moduleJSON.packs = moduleJSON.packs.filter(pack => this.packs.includes(pack.entity))
+        // TODO Support "uploading" media to the module.
+        moduleJSON.media.forEach((m) => {
+          m.url = m.url.replace('starter-scene-packer', this.moduleName)
+          m.thumbnail = m.thumbnail.replace('starter-scene-packer', this.moduleName)
+        })
+        moduleJSON.packs = moduleJSON.packs.filter(pack => this.packs.includes(pack.type))
         moduleJSON.packs.forEach((pack) => {
           pack.label = this.adventureName
           if (this[`${pack.type.toLowerCase()}Label`]) {
@@ -609,13 +602,29 @@ export default {
             pack.system = this.system
           }
         })
-        packOptions.forEach((pack) => {
-          if (!this.packs.includes(pack.type)) {
-            delete data[`${this.moduleName}/packs/${pack.name}.db`]
+        if (Array.isArray(moduleJSON.packFolders)) {
+          const allowedPackNames = new Set(moduleJSON.packs.map(p => p.name))
+          const prune = (folders) => {
+            return folders
+              .map(folder => {
+                if (Array.isArray(folder.packs)) {
+                  folder.packs = folder.packs.filter(p => allowedPackNames.has(p))
+                }
+                if (Array.isArray(folder.folders)) {
+                  folder.folders = prune(folder.folders)
+                }
+                const hasPacks = folder.packs && folder.packs.length > 0
+                const hasSubFolders = folder.folders && folder.folders.length > 0
+                return (hasPacks || hasSubFolders) ? folder : null
+              })
+              .filter(f => f)
           }
-        })
+          moduleJSON.packFolders = prune(moduleJSON.packFolders)
+          if (moduleJSON.packFolders.length === 0) {
+            delete moduleJSON.packFolders
+          }
+        }
         if (!this.scenePackerIntegration) {
-          delete moduleJSON.dependencies
           delete moduleJSON.relationships
         }
         data[`${this.moduleName}/module.json`] = fflate.strToU8(JSON.stringify(moduleJSON, null, 2))
@@ -628,17 +637,6 @@ export default {
         const modulePacks = this.additionalModulePacks.filter(j => j.value).map(j => j.value)
         if (!modulePacks.includes(this.moduleName)) {
           modulePacks.unshift(this.moduleName)
-        }
-
-        if (this.includesAdventure) {
-          // Adventure documents require v10+ so we can clean up older data values along with setting the minimum version.
-          delete moduleJSON.minimumCoreVersion
-          delete moduleJSON.compatibleCoreVersion
-          moduleJSON.compatibility.minimum = '10'
-
-          delete moduleJSON.name
-          delete moduleJSON.author
-          delete moduleJSON.dependencies
         }
 
         let scriptJS = Buffer.prototype.toString.call(data[`${this.moduleName}/scripts/init.js`], 'utf8')
